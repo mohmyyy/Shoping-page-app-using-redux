@@ -1,22 +1,9 @@
-const { createSlice, configureStore } = require("@reduxjs/toolkit");
-
-const initialCartState = {
-  showModal: false,
-};
-
-const cartSlice = createSlice({
-  name: "cart",
-  initialState: initialCartState,
-  reducers: {
-    showModalHandler(state) {
-      state.showModal = !state.showModal;
-    },
-  },
-});
+import uiReducer from "./ui-slice";
+import cartReducer from "./cart-slice";
+const { configureStore } = require("@reduxjs/toolkit");
 
 const store = configureStore({
-  reducer: cartSlice.reducer,
+  reducer: { ui: uiReducer, cart: cartReducer },
 });
 
-export const cartAction = cartSlice.actions;
 export default store;
