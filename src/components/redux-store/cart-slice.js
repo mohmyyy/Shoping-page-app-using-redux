@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { notificationAction } from "./notification-slice";
 
-const initialState = { items: [], totalQuantity: 0 };
+const initialState = { items: [], totalQuantity: 0, isChanged: false };
 
 const cartSlice = createSlice({
   name: "cart",
@@ -13,7 +13,7 @@ const cartSlice = createSlice({
     },
     addToCart(state, action) {
       const newItem = action.payload;
-      console.log(newItem);
+      state.isChanged = true;
       state.totalQuantity += 1;
       const existingItem = state.items.find((item) => {
         return item.id === newItem.id;
@@ -32,13 +32,13 @@ const cartSlice = createSlice({
       }
     },
     removeFromCart(state, action) {
-      console.log(action.payload);
+      state.totalQuantity--;
       const existingItem = state.items.find((item) => {
         return item.id === action.payload;
       });
+      state.isChanged = true;
       console.log(existingItem.quantity);
       if (existingItem.quantity === 1) {
-        console.log("helo");
         state.items = state.items.filter((item) => item.id !== action.payload);
       } else {
         existingItem.quantity--;
@@ -64,7 +64,10 @@ export const sendCardData = (cart) => {
         "https://react-redux-11dbf-default-rtdb.firebaseio.com/cart.json",
         {
           method: "PUT",
-          body: JSON.stringify(cart),
+          body: JSON.stringify({
+            items: cart.items,
+            totalQuantity: cart.totalQuantity,
+          }),
         }
       );
 
@@ -128,7 +131,12 @@ export const getData = () => {
     };
     try {
       const cartData = await cartGetFunction();
-      dispatch(cartAction.replaceCart(cartData));
+      dispatch(
+        cartAction.replaceCart({
+          items: cartData.items || [],
+          totalQuantity: cartData.totalQuantity,
+        })
+      );
     } catch (error) {
       dispatch(
         notificationAction.showNotification({

@@ -26,7 +26,9 @@ function App() {
       initialState = false;
       return;
     }
-    dispatch(sendCardData(cart));
+    if(cart.isChanged){
+      dispatch(sendCardData(cart));
+    }
   }, [cart, dispatch]);
 
   return (
